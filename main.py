@@ -1,4 +1,5 @@
 from threading import Thread
+import time
 
 
 from functions import create_random_int_list
@@ -16,7 +17,7 @@ sums = [0 for _ in range(threads_count)]
 def thread_list_sum(id: int, number_list: list[int]):
     sums[id] = sum(number_list)
 
-threads = []
+threads: list[Thread] = []
 
 remainig_threads = threads_count
 
@@ -26,11 +27,24 @@ iteration_offset = remainder if not matching_threads_count_and_list_size else li
 prev_iteration_offset = 0
 current_iteration_offset = iteration_offset
 
-for _ in range(threads_count):
+for idx in range(threads_count):
     if remainig_threads == 1:
-        print(filled_list[prev_iteration_offset:])
+        thread_list = filled_list[prev_iteration_offset:]
     else:
-        print(filled_list[prev_iteration_offset:current_iteration_offset])
+        thread_list = filled_list[prev_iteration_offset:current_iteration_offset]
+    threads.append(Thread(target=thread_list_sum, args=(idx, thread_list)))
     prev_iteration_offset = current_iteration_offset
     current_iteration_offset += iteration_offset
     remainig_threads -= 1
+
+
+start_time = time.time()
+for thread in threads:
+    thread.start()
+
+for thread in threads:
+    thread.join()
+
+print(sum(sums))
+end_time = time.time()
+print(f"Elapsed time: {end_time - start_time} seconds")
