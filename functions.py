@@ -13,6 +13,8 @@ def get_iteration_offset(list_size: int, threads_count: int):
     when splitting it across different threads. E.g.: every 5 elements, every 2 elements, etc.
     """
     remainder = list_size % threads_count
+    if list_size - threads_count == 2:
+        return 1
     iteration_offset = remainder if remainder != 0 else list_size // threads_count
     return iteration_offset
 
